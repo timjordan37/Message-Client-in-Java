@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<project name="JsonRPC in CPP using libjson-rpc-cpp" default="targets">
+   <taskdef resource="cpptasks.tasks"/>
+   <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+   <property name="src.dir" value="src"/>
+   <property name="classes.dir" value="classes"/>
+   <property name="host" value="localhost"/>
+   <property name="port" value="8080"/>
+   <property name="userId" value="tsjorda1"/>
+   <property name="json.file.name" value="MessageLibraryMethods.json"/>
+   <property environment="env"/>
+   <!--Set the ostype property: <property name="ostype" value="${env.OSTYPE}"/>-->
+    <condition property="ostype" value="${env.OSTYPE}">
+        <isset property="env.OSTYPE" />
+    </condition>
+    <condition property="ostype" value="env.OSTYPE_inaccessable">
+        <not>
+            <isset property="env.OSTYPE" />
+        </not>
+    </condition>
+
+   <target name="targets">
+      <echo message="Targets are clean, prepare, compile, targets, client, server"/>
+      <echo message="base directory is: ${basedir}"/>
+      <echo message="ostype is ${ostype}"/>
+      <echo message="" />
+      <echo message="Start server with ant server [host] [port]"/>
+      <echo message="Start client with ant client [userId] [host] [port]"/>
+   </target>
+
+   <path id="compile.classpath">
+      <pathelement location="${classes.dir}"/>
+      <fileset dir="${basedir}/lib">
+         <include name="json.jar"/>
+	 <include name="assign2Gui.jar"/>
+      </fileset>
+   </path>
+
+   <target name="clean">
+      <delete dir="${classes.dir}" failonerror="false"/>
+   </target>
+
+   <target name="prepare">
+      <mkdir dir="${classes.dir}"/>
+   </target>
+
+   <target name="build.all"
+           depends="clean,prepare,compile"
+           description="Clean then build java server, and java client"/>
+
+   <target name="compile" depends="prepare" description="Compile Java Sources">
+	<javac srcdir="${src.dir}" 
+		includeantruntime="false"
+		destdir="${classes.dir}">
+	   <classpath refid="compile.classpath"/>
+        </javac>
+   </target>
+
+   <target name="client" depends="compile" description="Run client">
+	<echo message="starting up client"/>
+	<java classname="ser321.assign6.tsjorda1.client.Controller" fork="yes">
+		<classpath refid="compile.classpath" />
+		<arg value="${hostId}"/>
+		<arg value="${port}"/>
+		<arg value="${userId}"/>
+	</java>
+   </target>
+
+   <target name="server" depends="compile" description="Run server">
+	<echo message="starting up server"/>
+	<java classname="ser321.assign6.tsjorda1.server.MessageLibraryTCPJsonRPCServer" fork="yes">
+		<classpath refid="compile.classpath"/>
+		<arg value="${hostId}"/>
+		<arg value="${port}"/>
+	</java>
+   </target>
+
+</project>
